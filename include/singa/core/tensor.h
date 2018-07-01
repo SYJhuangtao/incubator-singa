@@ -191,9 +191,9 @@ class Tensor {
   /// Change the axes
   Tensor Transpose(const vector<size_t> &axes) const;
 
-  Tensor Reshape(const Shape &shape);
+  //Tensor Reshape(const Shape &shape);
 
-  Tensor Reshape(Shape &&shape);
+  //Tensor Reshape(Shape &&shape);
 
   /// Copy the meta info with data block shared.
   Tensor &operator=(const Tensor &in);
@@ -309,7 +309,6 @@ Tensor Sign(const Tensor &in);
 Tensor Sqrt(const Tensor &in);
 Tensor Square(const Tensor &in);
 Tensor Tanh(const Tensor &in);
-Tensor Transform(const Tensor &in);
 
 void Abs(const Tensor &in, Tensor *out);
 void Exp(const Tensor &in, Tensor *out);

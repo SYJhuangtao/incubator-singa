@@ -124,62 +124,6 @@ void Tensor::ResetLike(const Tensor &in) {
   strides_ = in.strides_;
 }
 
-Tensor Tensor::Reshape(const Shape &shape) {
-  if (strides_.size() == 0)
-    strides_.push_back(1);
-
-  if (Product(shape_) != Product(shape)) {
-    if (block_ != nullptr && block_->DecRefCount() == 0)
-      device_->FreeBlock(block_);
-    block_ = device_->NewBlock((int)(Product(shape) * SizeOf(data_type_)));
-    shape_ = shape;
-    generate_strides();
-    return *this;
-
-  } else if (transpose()) {
-    Tensor t(shape_, device_, data_type_);
-    t.block_ = t.device()->NewBlock((int)(Product(shape) * SizeOf(data_type_)));
-    singa::Transform(*this, &t);
-    t.shape_ = shape;
-    return t;
- }
-
-  shape_ = shape;
-  generate_strides();
-  Tensor t(shape, device_, data_type_);
-  t.block_ = block_;
-  t.block_->IncRefCount();
-  return t;
-}
-
-Tensor Tensor::Reshape(Shape &&shape) {
-  if (strides_.size() == 0)
-    strides_.push_back(1);
-
-  if (Product(shape_) != Product(shape)) {
-    if (block_ != nullptr && block_->DecRefCount() == 0)
-      device_->FreeBlock(block_);
-    block_ = device_->NewBlock((int)(Product(shape) * SizeOf(data_type_)));
-    shape_ = std::move(shape);
-    generate_strides();
-    return *this;
-
-  } else if (transpose()) {
-    Tensor t(shape_, device_, data_type_);
-    t.block_ = t.device()->NewBlock((int)(Product(shape) * SizeOf(data_type_)));
-    singa::Transform(*this, &t);
-    t.shape_ = shape;
-    return t;
- }
-
-  shape_ = shape;
-  generate_strides();
-  Tensor t(shape, device_, data_type_);
-  t.block_ = block_;
-  t.block_->IncRefCount();
-  return t;
-}
-
 void Tensor::AsType(const DataType type) {
   if (data_type_ != type) {
     if (block_ != nullptr && block_->DecRefCount() == 0)
@@ -753,7 +697,6 @@ GenUnaryTensorFn(Sign);
 GenUnaryTensorFn(Sqrt);
 GenUnaryTensorFn(Square);
 GenUnaryTensorFn(Tanh);
-GenUnaryTensorFn(Transform);
 
 #define EltwiseBinaryTensorFn(fn, lhs, rhs, ret)                            \
   do {                                                                      \
